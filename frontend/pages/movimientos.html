@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movimientos - Inventario de Seguridad</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <!-- Navbar -->
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            </li>
+            <li class="nav-item d-none d-sm-inline-block">
+                <a href="../index.html" class="nav-link">Home</a>
+            </li>
+            <li class="nav-item d-none d-sm-inline-block">
+                <a href="#" class="nav-link">Contact</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link logout-btn" href="#">Cerrar Sesión <i class="fas fa-sign-out-alt"></i></a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <!-- Brand Logo -->
+        <a href="../index.html" class="brand-link">
+            <i class="fas fa-warehouse brand-logo ml-3 mr-2"></i>
+            <span class="brand-text font-weight-light">Inventario Seguridad</span>
+        </a>
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <li class="nav-item">
+                        <a href="../index.html" class="nav-link">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="roles.html" class="nav-link">
+                            <i class="nav-icon fas fa-user-tag"></i>
+                            <p>Roles</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="empleados.html" class="nav-link">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p>Empleados</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="categorias.html" class="nav-link">
+                            <i class="nav-icon fas fa-list"></i>
+                            <p>Categorías</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="proveedores.html" class="nav-link">
+                            <i class="nav-icon fas fa-truck"></i>
+                            <p>Proveedores</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="productos.html" class="nav-link">
+                            <i class="nav-icon fas fa-box"></i>
+                            <p>Productos</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="ubicaciones.html" class="nav-link">
+                            <i class="nav-icon fas fa-map-marker-alt"></i>
+                            <p>Ubicaciones</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="movimientos.html" class="nav-link active">
+                            <i class="nav-icon fas fa-exchange-alt"></i>
+                            <p>
+                                Movimientos
+                                <span class="right badge badge-info">Nuevos</span>
+                            </p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="inventario.html" class="nav-link">
+                            <i class="nav-icon fas fa-warehouse"></i>
+                            <p>
+                                Inventario Actual
+                                <span class="right badge badge-danger">Stock Bajo</span>
+                            </p>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Contenido -->
+    <div class="content-wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Movimientos</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item active">Movimientos</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="content">
+            <div class="container-fluid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Lista de Movimientos</h3>
+                        <button class="btn btn-primary float-right" id="addMovementBtn">Agregar Movimiento</button>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Producto</th>
+                                    <th>Ubicación</th>
+                                    <th>Empleado</th>
+                                    <th>Tipo</th>
+                                    <th>Cantidad</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="movementsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Modal para agregar/editar movimiento -->
+                <div class="modal fade" id="movementModal" tabindex="-1" role="dialog" aria-labelledby="movementModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="movementModalLabel">Agregar Movimiento</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="movementForm">
+                                    <div class="form-group">
+                                        <label for="id_producto">Producto</label>
+                                        <select class="form-control" id="id_producto" required>
+                                            <option value="" disabled selected>Selecciona un producto</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="id_ubicacion">Ubicación</label>
+                                        <select class="form-control" id="id_ubicacion" required>
+                                            <option value="" disabled selected>Selecciona una ubicación</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="id_empleado">Empleado</label>
+                                        <select class="form-control" id="id_empleado" required>
+                                            <option value="" disabled selected>Selecciona un empleado</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="tipo_movimiento">Tipo de Movimiento</label>
+                                        <select class="form-control" id="tipo_movimiento" required>
+                                            <option value="" disabled selected>Selecciona un tipo</option>
+                                            <option value="Entrada">Entrada</option>
+                                            <option value="Salida">Salida</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cantidad">Cantidad</label>
+                                        <input type="number" class="form-control" id="cantidad" required>
+                                    </div>
+                                    <input type="hidden" id="movementId">
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                <button type="button" class="btn btn-primary" id="saveMovementBtn">Guardar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <strong>Desarrollado con AdminLTE</strong>
+        <div class="float-right d-none d-sm-inline-block">
+            <b>Versión</b> 1.0.0
+        </div>
+    </footer>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/js/adminlte.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Verificar si hay token
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '../login.html';
+        return;
+    }
+
+    // Añadir el token a todas las solicitudes AJAX
+    $.ajaxSetup({
+        headers: {
+            'Authorization': 'Bearer ' + token
+        },
+        error: function(err) {
+            if (err.status === 401 || err.status === 403) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '../login.html';
+            }
+        }
+    });
+
+    // Mostrar nombre del usuario en el navbar
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+        $('.navbar-nav.ml-auto').prepend(`<li class="nav-item"><a class="nav-link">Bienvenido, ${user.nombre}</a></li>`);
+    }
+
+    // Botón de cerrar sesión
+    $('.navbar-nav.ml-auto').on('click', '.logout-btn', function() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '../login.html';
+    });
+
+    // Cargar productos, ubicaciones y empleados para los selects
+    $.get('http://localhost:3000/api/productos', function(data) {
+        const select = $('#id_producto');
+        data.forEach(prod => select.append(`<option value="${prod.id_producto}">${prod.nombre}</option>`));
+    });
+    $.get('http://localhost:3000/api/ubicaciones', function(data) {
+        const select = $('#id_ubicacion');
+        data.forEach(loc => select.append(`<option value="${loc.id_ubicacion}">${loc.nombre}</option>`));
+    });
+    $.get('http://localhost:3000/api/empleados', function(data) {
+        const select = $('#id_empleado');
+        data.forEach(emp => select.append(`<option value="${emp.id_empleado}">${emp.nombre}</option>`));
+    });
+
+    // Cargar movimientos
+    function loadMovements() {
+        $.get('http://localhost:3000/api/movimientos', function(data) {
+            const tbody = $('#movementsTable');
+            tbody.empty();
+            data.forEach(mov => {
+                tbody.append(`
+                    <tr>
+                        <td>${mov.id_movimiento}</td>
+                        <td>${mov.producto}</td>
+                        <td>${mov.ubicacion}</td>
+                        <td>${mov.empleado}</td>
+                        <td>${mov.tipo_movimiento}</td>
+                        <td>${mov.cantidad}</td>
+                        <td>${mov.fecha}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary edit-btn" data-id="${mov.id_movimiento}">Editar</button>
+                            <button class="btn btn-sm btn-danger delete-btn" data-id="${mov.id_movimiento}">Eliminar</button>
+                        </td>
+                    </tr>
+                `);
+            });
+        });
+    }
+    loadMovements();
+
+    // Abrir modal para agregar movimiento
+    $('#addMovementBtn').click(function() {
+        $('#movementModalLabel').text('Agregar Movimiento');
+        $('#movementForm')[0].reset();
+        $('#movementId').val('');
+        $('#movementModal').modal('show');
+    });
+
+    // Guardar movimiento
+    $('#saveMovementBtn').click(function() {
+        const data = {
+            id_producto: $('#id_producto').val(),
+            id_ubicacion: $('#id_ubicacion').val(),
+            id_empleado: $('#id_empleado').val(),
+            tipo_movimiento: $('#tipo_movimiento').val(),
+            cantidad: $('#cantidad').val()
+        };
+        const url = $('#movementId').val() ? `http://localhost:3000/api/movimientos/${$('#movementId').val()}` : 'http://localhost:3000/api/movimientos';
+        const method = $('#movementId').val() ? 'PUT' : 'POST';
+
+        $.ajax({
+            url: url,
+            method: method,
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function() {
+                $('#movementModal').modal('hide');
+                loadMovements();
+            },
+            error: function(err) {
+                alert('Error: ' + err.responseJSON.error);
+            }
+        });
+    });
+
+    // Editar movimiento
+    $(document).on('click', '.edit-btn', function() {
+        const id = $(this).data('id');
+        $.get(`http://localhost:3000/api/movimientos/${id}`, function(data) {
+            $('#movementModalLabel').text('Editar Movimiento');
+            $('#id_producto').val(data.id_producto);
+            $('#id_ubicacion').val(data.id_ubicacion);
+            $('#id_empleado').val(data.id_empleado);
+            $('#tipo_movimiento').val(data.tipo_movimiento);
+            $('#cantidad').val(data.cantidad);
+            $('#movementId').val(data.id_movimiento);
+            $('#movementModal').modal('show');
+        });
+    });
+
+    // Eliminar movimiento
+    $(document).on('click', '.delete-btn', function() {
+        if (confirm('¿Estás seguro de eliminar este movimiento?')) {
+            const id = $(this).data('id');
+            $.ajax({
+                url: `http://localhost:3000/api/movimientos/${id}`,
+                method: 'DELETE',
+                success: function() {
+                    loadMovements();
+                },
+                error: function(err) {
+                    alert('Error: ' + err.responseJSON.error);
+                }
+            });
+        }
+    });
+});
+</script>
+</body>
+</html>

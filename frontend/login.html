@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Inventario de Seguridad</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+<body class="hold-transition login-page">
+<div class="login-box">
+    <div class="login-logo">
+        <a href="#"><b>Inventario</b> Seguridad</a>
+    </div>
+    <div class="card">
+        <div class="card-body login-card-body">
+            <p class="login-box-msg">Inicia sesión para comenzar</p>
+            <form id="loginForm">
+                <div class="input-group mb-3">
+                    <input type="email" class="form-control" id="correo" placeholder="Correo" required>
+                    <div class="input-group-append">
+                        <div class="input-group-text"><span class="fas fa-envelope"></span></div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="password" class="form-control" id="contrasena" placeholder="Contraseña" required>
+                    <div class="input-group-append">
+                        <div class="input-group-text"><span class="fas fa-lock"></span></div>
+                    </div>
+                </div>
+                <div class="g-recaptcha mb-3" data-sitekey="6LdpbHArAAAAALWOuOs8cx9a1GqAFo1esTXv3EdN"></div> <div class="row">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary btn-block">Iniciar Sesión</button>
+                </div>
+            </div>
+            </form>
+            <p class="mb-1 mt-3 text-center">
+                ¿No tienes una cuenta? <a href="register.html" class="text-center">Regístrate</a>
+            </p>
+            <div class="social-auth-links text-center mb-3">
+                <p>- O -</p>
+                <a href="http://localhost:3000/auth/google" class="btn btn-block btn-danger">
+                    <i class="fab fa-google mr-2"></i> Iniciar sesión con Google
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/js/adminlte.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#loginForm').submit(function(e) {
+            e.preventDefault();
+
+            // OBTENER TOKEN RECAPTCHA
+            const recaptchaResponse = grecaptcha.getResponse();
+            if (!recaptchaResponse) {
+                alert('Por favor, completa el reCAPTCHA.');
+                return;
+            }
+
+            const data = {
+                correo: $('#correo').val(),
+                contrasena: $('#contrasena').val(),
+                recaptchaToken: recaptchaResponse // <-- AÑADIR ESTA LÍNEA
+            };
+
+            $.ajax({
+                url: 'http://localhost:3000/api/login',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response) {
+                    localStorage.setItem('token', response.token);
+                    localStorage.setItem('user', JSON.stringify(response.user));
+                    window.location.href = 'index.html';
+                },
+                error: function(err) {
+                    alert('Error de inicio de sesión: ' + (err.responseJSON ? err.responseJSON.error : 'Error desconocido'));
+                    grecaptcha.reset(); // <-- RESETEAR RECAPTCHA EN CASO DE ERROR
+                }
+            });
+        });
+
+        // --- MANEJO DE REDIRECCIÓN DESDE OAUTH ---
+        const urlParams = new URLSearchParams(window.location.hash.substring(1)); // Parsea el hash de la URL
+        const token = urlParams.get('token');
+        const nombre = urlParams.get('nombre');
+        const id_empleado = urlParams.get('id_empleado');
+        const id_rol = urlParams.get('id_rol');
+
+        if (token && nombre && id_empleado && id_rol) {
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify({
+                id_empleado: id_empleado,
+                nombre: nombre,
+                id_rol: id_rol // Puedes añadir más datos si tu API los devuelve
+            }));
+            window.location.href = 'index.html'; // Redirige al dashboard
+        }
+    });
+</script>
+</body>
+</html>

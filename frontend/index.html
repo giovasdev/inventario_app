@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Inventario de Seguridad</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+        // --- Lógica para manejar el token del hash de la URL ---
+        const hash = window.location.hash; // Obtener el hash de la URL (ej. #token=...)
+        if (hash) {
+            const params = new URLSearchParams(hash.substring(1)); // Eliminar el '#' y parsear
+            const token = params.get('token');
+            const nombre = params.get('nombre');
+            const id_empleado = params.get('id_empleado');
+            const id_rol = params.get('id_rol');
+
+            if (token) {
+                // Almacenar el token y la información del usuario en localStorage
+                localStorage.setItem('token', token);
+                // Asegúrate de que el objeto user contenga la información necesaria para tu frontend
+                localStorage.setItem('user', JSON.stringify({
+                    id_empleado: id_empleado,
+                    nombre: decodeURIComponent(nombre), // Decodificar el nombre
+                    id_rol: id_rol
+                }));
+
+                // Limpiar el hash de la URL para que no se muestre el token en la barra de direcciones
+                // Esto también evita que se intente procesar el token en cada recarga de la página
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+        // --- Fin de la lógica para manejar el token ---
+
+        // Comprobar si el usuario está logueado (ahora usa el token guardado)
+        const storedToken = localStorage.getItem('token');
+        if (!storedToken) {
+            // Si no hay token en localStorage (ni en el hash), redirige al login
+            window.location.href = 'login.html';
+        } else {
+            // Si hay token, puedes cargar los datos del dashboard
+            // Asegúrate de que todas tus llamadas a la API envíen este token en los headers
+            // Esto ya lo tienes implementado en tus otros archivos HTML (como categorias.html, etc.)
+            // Puedes llamar a una función para inicializar el dashboard aquí
+            // Por ejemplo: loadDashboardData();
+            // Y mostrar el nombre del usuario si es necesario
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user && user.nombre) {
+                document.getElementById('userNameDisplay').textContent = user.nombre; // Asegúrate de tener un elemento con id='userNameDisplay' en tu HTML
+                document.getElementById('sidebarUserName').textContent = user.nombre; // Si tienes nombre en el sidebar
+            }
+        }
+
+        // Función para cerrar sesión
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // Asocia esta función a tu botón de cerrar sesión
+        // Por ejemplo: <a href="#" class="nav-link logout-btn" onclick="logout()">Cerrar Sesión</a>
+        // O si ya usas jQuery:
+        $(document).ready(function() {
+             $('.logout-btn').on('click', logout);
+        });
+
+    </script>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <!-- Navbar -->
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            </li>
+            <li class="nav-item d-none d-sm-inline-block">
+                <a href="index.html" class="nav-link">Home</a>
+            </li>
+            <li class="nav-item d-none d-sm-inline-block">
+                <a href="#" class="nav-link">Contact</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link logout-btn" href="#">Cerrar Sesión <i class="fas fa-sign-out-alt"></i></a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <!-- Brand Logo -->
+        <a href="index.html" class="brand-link">
+            <i class="fas fa-warehouse brand-logo ml-3 mr-2"></i>
+            <span class="brand-text font-weight-light">Inventario Seguridad</span>
+        </a>
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link active">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="pages/roles.html" class="nav-link">
+                            <i class="nav-icon fas fa-user-tag"></i>
+                            <p>Roles</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="pages/empleados.html" class="nav-link">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p>Empleados</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="pages/categorias.html" class="nav-link">
+                            <i class="nav-icon fas fa-list"></i>
+                            <p>Categorías</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="pages/proveedores.html" class="nav-link">
+                            <i class="nav-icon fas fa-truck"></i>
+                            <p>Proveedores</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="pages/productos.html" class="nav-link">
+                            <i class="nav-icon fas fa-box"></i>
+                            <p>Productos</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="pages/ubicaciones.html" class="nav-link">
+                            <i class="nav-icon fas fa-map-marker-alt"></i>
+                            <p>Ubicaciones</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="pages/movimientos.html" class="nav-link">
+                            <i class="nav-icon fas fa-exchange-alt"></i>
+                            <p>
+                                Movimientos
+                                <span class="right badge badge-info">Nuevos</span>
+                            </p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="pages/inventario.html" class="nav-link">
+                            <i class="nav-icon fas fa-warehouse"></i>
+                            <p>
+                                Inventario Actual
+                                <span class="right badge badge-danger">Stock Bajo</span>
+                            </p>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Contenido -->
+    <div class="content-wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Dashboard</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item active">Dashboard</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="content">
+            <div class="container-fluid">
+                <!-- Tarjetas de Estadísticas -->
+                <div class="row">
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-primary">
+                            <div class="inner">
+                                <h3 id="totalProductos">0</h3>
+                                <p>Productos</p>
+                            </div>
+                            <div class="icon"><i class="fas fa-box"></i></div>
+                            <a href="pages/productos.html" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-success">
+                            <div class="inner">
+                                <h3 id="totalMovimientos">0</h3>
+                                <p>Movimientos</p>
+                            </div>
+                            <div class="icon"><i class="fas fa-exchange-alt"></i></div>
+                            <a href="pages/movimientos.html" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-warning">
+                            <div class="inner">
+                                <h3 id="totalEmpleados">0</h3>
+                                <p>Empleados</p>
+                            </div>
+                            <div class="icon"><i class="fas fa-users"></i></div>
+                            <a href="pages/empleados.html" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-danger">
+                            <div class="inner">
+                                <h3 id="stockBajo">0</h3>
+                                <p>Stock Bajo</p>
+                            </div>
+                            <div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
+                            <a href="pages/inventario.html" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráficos -->
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Movimientos a lo largo del tiempo</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="movimientosChart" style="height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Stock por Categoría</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="stockPieChart" style="height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Últimos Movimientos -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Últimos Movimientos</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Tipo</th>
+                                            <th>Cantidad</th>
+                                            <th>Fecha</th>
+                                            <th>Empleado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ultimosMovimientos"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <strong>Desarrollado con AdminLTE by DEVAGVA</strong>
+        <div class="float-right d-none d-sm-inline-block">
+            <b>Versión</b> 1.0.0
+        </div>
+    </footer>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/js/adminlte.min.js"></script>
+<script>
+
+    $(document).ready(function() {
+        // Inicialización manual del sidebar
+        $('[data-widget="pushmenu"]').PushMenu('toggle');
+    });
+
+$(document).ready(function() {
+    // Verificar si hay token
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Añadir el token a todas las solicitudes AJAX
+    $.ajaxSetup({
+        headers: {
+            'Authorization': 'Bearer ' + token
+        },
+        error: function(err) {
+            if (err.status === 401 || err.status === 403) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = 'login.html';
+            }
+        }
+    });
+
+    // Mostrar nombre del usuario en el navbar
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+        $('.navbar-nav.ml-auto').prepend(`<li class="nav-item"><a class="nav-link">Bienvenido, ${user.nombre}</a></li>`);
+    }
+
+    // Botón de cerrar sesión
+    $('.navbar-nav.ml-auto').on('click', '.logout-btn', function() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+    });
+
+    // Cargar estadísticas
+    $.get('http://localhost:3000/api/productos', function(data) {
+        $('#totalProductos').text(data.length);
+    });
+
+    $.get('http://localhost:3000/api/movimientos', function(data) {
+        $('#totalMovimientos').text(data.length);
+        // Últimos 5 movimientos
+        const ultimos = data.slice(0, 5);
+        const tbody = $('#ultimosMovimientos');
+        tbody.empty();
+        ultimos.forEach(mov => {
+            tbody.append(`<tr><td>${mov.producto}</td><td>${mov.tipo_movimiento}</td><td>${mov.cantidad}</td><td>${mov.fecha}</td><td>${mov.empleado}</td></tr>`);
+        });
+
+        // Gráfico de Movimientos (Entradas y Salidas)
+        const fechas = [...new Set(data.map(mov => mov.fecha.split('T')[0]))].sort();
+        const entradas = fechas.map(fecha => {
+            return data.filter(mov => mov.fecha.split('T')[0] === fecha && mov.tipo_movimiento === 'Entrada')
+                       .reduce((sum, mov) => sum + mov.cantidad, 0);
+        });
+        const salidas = fechas.map(fecha => {
+            return data.filter(mov => mov.fecha.split('T')[0] === fecha && mov.tipo_movimiento === 'Salida')
+                       .reduce((sum, mov) => sum + mov.cantidad, 0);
+        });
+
+        const ctx = document.getElementById('movimientosChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: fechas,
+                datasets: [
+                    {
+                        label: 'Entradas',
+                        data: entradas,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: true
+                    },
+                    {
+                        label: 'Salidas',
+                        data: salidas,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    });
+
+    $.get('http://localhost:3000/api/empleados', function(data) {
+        $('#totalEmpleados').text(data.length);
+    });
+
+    $.get('http://localhost:3000/api/inventario', function(data) {
+        const stockBajo = data.filter(item => item.stock_actual < 10).length;
+        $('#stockBajo').text(stockBajo);
+
+        // Gráfico de Stock por Categoría (Circular)
+        $.get('http://localhost:3000/api/categorias', function(categorias) {
+            $.get('http://localhost:3000/api/productos', function(productos) {
+                const stockData = categorias.map(cat => {
+                    const productosCat = productos.filter(prod => prod.id_categoria === cat.id_categoria);
+                    return data.filter(item => productosCat.some(prod => prod.id_producto === item.id_producto))
+                               .reduce((sum, item) => sum + item.stock_actual, 0);
+                });
+
+                const ctxPie = document.getElementById('stockPieChart').getContext('2d');
+                new Chart(ctxPie, {
+                    type: 'pie',
+                    data: {
+                        labels: categorias.map(cat => cat.nombre),
+                        datasets: [{
+                            label: 'Stock por Categoría',
+                            data: stockData,
+                            backgroundColor: [
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(255, 206, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(153, 102, 255, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true
+                    }
+                });
+            });
+        });
+    });
+});
+</script>
+</body>
+</html>
